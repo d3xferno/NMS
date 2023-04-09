@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import Card from "./components/card"
+import Comment from "./components/comment"
+import Footer from "./components/footer"
+import Navbar from "./components/navbar"
+import Request from "./components/request"
+import SearchBar from "./components/searchbar"
+import SignIn from "./components/signin"
+import SignUp from "./components/signup"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default function App(){
+    return (
+        <div>
+            <Navbar/>
+            <Request/>
+            <SignIn/>
+            <SignUp/>
+            <SearchBar/>
+            <Card/>
+            <Card/>
+            <Card/>
+            <Card/>
+            <Comment/>
+            <Comment/>
+            <Comment/>
+            <Comment/>
+            <Footer/>
+        </div>
+    )
 }
-
-export default App;
