@@ -2,11 +2,11 @@ export default function SignUp(){
     return(
         <>
             <form>
-                <div className="flex flex-col w-1/4 space-y-5 m-10 p-5">
+                <div className="flex flex-col space-y-5 p-5 w-[450px]">
                     <label className="text-[20px] font-semibold">Username</label>
-                    <input type="text" placeholder="Enter Username" className="rounded-sm p-2 border-2 focus:outline-none focus:border-2 focus:border-black"/>
+                    <input type="text" placeholder="Enter Username" className="rounded-sm p-2 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
                     <label className="text-[20px] font-semibold">Department</label>
-                    <select className="rounded-sm p-2 border-2 focus:outline-none focus:border-2 focus:border-black">
+                    <select className="rounded-sm p-2 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100">
                         <option>Department</option>
                         <option>BME</option>
                         <option>CHEM</option>
@@ -18,12 +18,12 @@ export default function SignUp(){
                         <option>MECH</option>
                     </select>
                     <label className="text-[20px] font-semibold">Password</label>
-                    <input type="password" placeholder="Enter password" className="rounded-sm p-2 border-2 focus:outline-none focus:border-2 focus:border-black"/>
+                    <input type="password" placeholder="Enter password" className="rounded-sm p-2 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
                     <label className="text-[20px] font-semibold">Confirm Password</label>
-                    <input type="password" placeholder="Re-Enter password" className="rounded-sm p-2 border-2 focus:outline-none focus:border-2 focus:border-black"/>
+                    <input type="password" placeholder="Re-Enter password" className="rounded-sm p-2 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
                     <label className="text-[20px] font-semibold">Profile Image <span className="text-[14px] font-normal">(Optional)</span></label>
-                    <input type="file" className="rounded-sm p-4 border-2 focus:outline-none focus:border-2 focus:border-black"/>
-                    <button type="button" className="border-2 p-2 text-[18px] font-semibold rounded-sm">Sign Up</button>
+                    <input type="file" className="rounded-sm p-4 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
+                    <button type="button" className="border-2 p-2 text-[18px] font-semibold rounded-sm hover:bg-gray-200">Sign Up</button>
                 </div>
            </form> 
         </>
