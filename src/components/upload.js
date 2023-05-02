@@ -1,4 +1,17 @@
+import { ipfsClient } from "../utils/ipfs-core"
+import { useState } from "react"
+
 export default function Upload(){
+    const [file,setFile] = useState(null)
+    const [pdfUrl,setPdfUrl] = useState('')
+    async function ipfsUpload(){
+        const client = await ipfsClient()
+        const {cid} = await client.add(file)
+        const CID = cid.toString()
+        setPdfUrl(`https://ipfs.io/ipfs/${CID}`)
+        console.log(CID);       
+    }
+
     return (
         <> 
             <form>
@@ -20,10 +33,17 @@ export default function Upload(){
                     <label className="text-[20px] font-semibold">Tags</label>
                     <input type="text" placeholder="Enter tags" className="rounded-sm p-2 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
                     <label className="text-[20px] font-semibold">File</label>
-                    <input type="file" className="rounded-sm p-4 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
-                    <button type="button" className="border-2 p-2 text-[18px] font-semibold rounded-sm hover:bg-gray-200">Upload</button>
+                    <input 
+                        onChange = {e => {
+                            setFile(e.target.files[0])
+                        }}
+                    type="file" className="rounded-sm p-4 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
+                    <button onClick={ipfsUpload} type="button" className="border-2 p-2 text-[18px] font-semibold rounded-sm hover:bg-gray-200">Upload</button>
                 </div>
            </form> 
+           <iframe src={pdfUrl} className="w-[50%] h-screen">
+
+           </iframe>
         </>
     )
 }
