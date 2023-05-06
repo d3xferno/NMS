@@ -1,6 +1,22 @@
+import { useContext, useEffect,useState } from "react"
 import Comments from "../components/comments"
+import api from "../utils/axios"
+import { NoteContext } from "../contexts/context"
 
 export default function Note(){
+
+    const {cid} = useContext(NoteContext)
+
+    async function fetchNote(){
+        const data = await api.get(`note/${cid}`)
+        console.log(data.data)
+    }
+
+    useEffect(()=>{
+        fetchNote()
+        console.log('note loaded')
+    },[])
+
     return(
         <div className="flex justify-center gap-4">
             <div className="w-1/2">
@@ -18,9 +34,9 @@ export default function Note(){
                     </div>
                     
                 </div>
-                <iframe src="https://www.orimi.com/pdf-test.pdf" className="w-full h-[80vh] p-4 outline-none"/>
+                <iframe src={`https://ipfs.io/ipfs/${cid}`} className="w-full h-[80vh] p-4 outline-none"/>
             </div>
-            <Comments/>
+            <Comments cid={cid}/>
         </div>
     )
 }

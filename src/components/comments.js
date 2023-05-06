@@ -1,26 +1,35 @@
+import api from '../utils/axios';
 import Comment from './comment'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export default function Comments(){
-    let cmnts = [
-        {
-            username:"Shajith",likes:0,text:"Thanks for this PDF"
-        },
-        {
-            username:"Shajith",likes:0,text:"Thanks for this PDF"
-        },
-        {
-            username:"Shajith",likes:0,text:"Thanks for this PDF"
-        },
-        {
-            username:"Shajith",likes:0,text:"Thanks for this PDF"
-        },
-        {
-            username:"Shajith",likes:0,text:"Thanks for this PDF"
-        },
-    ]
-    const [comments,setComments] = useState(cmnts);
+export default function Comments({cid}){
+    const [comments,setComments] = useState([]);
     const [text,setText] = useState('')
+
+    async function handleAddComment(){
+        const cmnt = {
+            username:JSON.parse(sessionStorage.getItem('auth')).username,
+            likes:0,
+            comment:text
+        }
+        setComments([...comments,cmnt])
+        setText('')
+        const res = await api.post('/comment',{
+            cid:cid,
+            username:cmnt.username,
+            content:cmnt.comment
+        })
+        console.log(res)
+    }
+
+    async function loadComments(){
+        const cmnts = (await api.get(`note/${cid}`)).data.comments
+        setComments(cmnts) 
+    }
+
+    useEffect(()=>{
+        loadComments()
+    },[])
 
     return (
         <div className=''>  
@@ -33,14 +42,7 @@ export default function Comments(){
                     value={text}
                     type='text' placeholder='type something . .' className='rounded-md p-2 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100 w-full'/>
                 <button
-                    onClick={e => {setComments([...comments,{
-                        username:"New User",
-                        likes:0,
-                        text:text
-                    }])
-                    setText('')
-                    }
-                    } 
+                    onClick={handleAddComment} 
                     type='button' className="border-2 p-2 text-[15px] font-semibold rounded-md hover:bg-gray-200">Add Comment</button>
             </div>
             <div className='h-[62vh] overflow-auto p-0'>
@@ -48,7 +50,14 @@ export default function Comments(){
                     comments
                     &&
                     comments.map((comment,index)=>(
-                        <Comment key={index} username={comment.username} text={comment.text} likes={comment.likes}/>
+                        <Comment 
+                            cid={cid}
+                            key={index} 
+                            username={comment.username} 
+                            text={comment.comment} 
+                            likes={comment.likes} 
+                            index={index}
+                        />
                     ))
                 }
             </div>

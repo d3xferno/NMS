@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import api from "../utils/axios"
+import {useNavigate} from 'react-router-dom'
+import { NoteContext } from "../contexts/context";
 
 export default function SearchPage(){
     
@@ -12,6 +15,8 @@ export default function SearchPage(){
 
     const [results,setResults] = useState(null);
 
+    const {cid,setCid} = useContext(NoteContext)
+
     function Content(){
         if(results===null)return <div>No Search Results</div>
         else return <div>Results Found</div>    
@@ -21,15 +26,43 @@ export default function SearchPage(){
     const [dept,setDept] = useState('');
     const [course,setCourse] = useState('');
 
-    function submit(e){
+    async function submit(e){
         e.preventDefault();
         const formData = {
             text:search,
-            dept:dept,
-            course:course,
-            tags:tags
+            dept:dept.toUpperCase(),
+            course_code:course,
+            tag:tags
         }
+        if(tags.length===0){delete formData.tag}
         console.log(formData);
+        await fetchNotes(formData)
+    }
+
+    async function fetchNotes(formData){
+        const res = await api.post('/search',formData)
+        setResults(res.data)
+        console.log(res.data)
+    } 
+
+    function SearchItem(details){
+        console.log(details.details.CID)
+        const navigate = useNavigate()
+        return(
+            <div 
+                onClick={()=>{
+                    navigate('/note')
+                    setCid(details.details.CID)
+                    sessionStorage.setItem('cid',details.details.CID)
+                }}
+            className="cursor-pointer flex justify-between border-2 p-4 rounded-md mx-5 w-[80%] items-center">
+                <p>{details.details.title}</p>
+                <div className="text-[18px] flex gap-10">
+                    <p>{details.details.course_code}</p>
+                    <p className="">{(details.details.tags)}</p>
+                </div>
+            </div>
+        )
     }
 
     return(
@@ -93,8 +126,15 @@ export default function SearchPage(){
                     </div>
                 </div>
             </form>
-            <div className="bg-white flex justify-center font-semibold text-[25px] min-h-screen">
+            <div className="bg-white flex flex-col  items-center gap-4 font-semibold text-[25px] min-h-screen">
                 <Content/>
+                {
+                    results
+                    &&
+                    results.map((result,index)=>(
+                        <SearchItem details={result} key={index}/>
+                    ))
+                }
             </div>
         </div>
     )
