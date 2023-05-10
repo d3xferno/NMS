@@ -25,8 +25,10 @@ export default function SignUpPage(){
                 if(res.status==201){
                     setError("User Already Exists")
                 }else{
-                    navigate('/')
-                    setAuth(true)
+                    navigate("/")
+                    setAuth(formData)
+                    console.log(JSON.stringify(formData))
+                    sessionStorage.setItem('auth',JSON.stringify(formData))
                 }
             })
             .catch(err => {

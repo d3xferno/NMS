@@ -1,17 +1,18 @@
 import api from "../utils/axios"
 import { useState } from "react"
 
-export default function Comment({cid,username,text,likes,index}){
+export default function Comment({id,username,text,likes,index}){
 
     const [currLikes,setCurrLikes] = useState(likes || 0)
 
     async function handleLike(){
         const res = await api.post('/likecomment',{
-            cid:cid,
+            id:id,
             username:JSON.parse(sessionStorage.getItem('auth')).username,
             index:index
         })
-        setCurrLikes(currLikes+1)
+        console.log(res)
+        setCurrLikes(currLikes+(res.data==='Liked'?1:-1))
     }
     return(
         <>

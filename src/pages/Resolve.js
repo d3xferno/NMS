@@ -1,21 +1,23 @@
 import api from "../utils/axios"
 import { ipfsClient } from "../utils/ipfs-core"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import Loading from "../components/Loading"
+import { NoteContext } from "../contexts/context"
+import { useNavigate } from "react-router-dom"
 
-export default function Resolve({id}){
+export default function Resolve(){
 
     const [formData,setFormData] = useState({
+        _id:sessionStorage.getItem('id'),
         title:'',
         cid:'',
         tags:'',
         department:'Department',
         course_code:''
     })
-
+    const navigate = useNavigate()
+    const {id,setId} = useContext(NoteContext)
     const [loading,setLoading] = useState(false)
-
-    const [Cid,setCid] = useState('')
 
     const [file,setFile] = useState(null)
     const [pdfUrl,setPdfUrl] = useState(null)
@@ -26,7 +28,6 @@ export default function Resolve({id}){
         const CID = cid.toString()
         setPdfUrl(`https://ipfs.io/ipfs/${CID}`)
         setFormData({...formData,cid:CID})
-        setCid(CID)
         setLoading(false)
         // await api.post('/upload',formData)
     }
@@ -35,9 +36,9 @@ export default function Resolve({id}){
         setFormData({...formData,[e.target.name]:e.target.value})
     }
 
-    async function addNote(){
+    async function addResolve(){
         setLoading(true)
-        const res = await api.post('/upload',formData)
+        const res = await api.post('/updaterequest',formData)
         setLoading(false)
         setFormData({
             title:'',
@@ -50,28 +51,40 @@ export default function Resolve({id}){
         setPdfUrl(null)
         setFile(null)
         setTmpNotes([...tmpNotes,formData])
+
     }
 
     const [tmpNotes,setTmpNotes] = useState([])
 
     async function getTempNotes(id){
-        const tmp = await api.post('/tmpnotes',{_id:id})
-        setTmpNotes(tmp)
+        const tmp = await api.post('/getresolves',{_id:id})
+        console.log(tmp.data)
+        setTmpNotes(tmp.data)
     }
 
     useEffect(()=>{
         getTempNotes(id)
     },[])
 
-    function TempRequest({cid}){
+    function TempRequest({args,index}){
         return(
-            <div className="flex justify-between w-[750px] items-center p-5 rounded-md shadow-xl">
-                <p className="font-semibold text-[20px]">{`Upload #${1}`}</p>
+            <div className="flex justify-between w-[85%] items-center p-5 rounded-md shadow-xl">
+                <p className="font-semibold text-[20px]">{args.title}</p>
                 <div className="flex gap-5">
                 <button 
-                className="border-2 rounded-md p-2 hover:bg-gray-200"><a target="_blank" href={`https://ipfs.io/ipfs/${cid}`}>Preview</a></button>
-                <button className="border-2 rounded-md p-2 hover:bg-gray-200">Accept</button>
-                <button className="border-2 rounded-md p-2 hover:bg-gray-200">Reject</button>
+                className="border-2 rounded-md p-2 hover:bg-gray-200"><a target="_blank" href={`https://ipfs.io/ipfs/${args.cid}`}>Preview</a></button>
+                <button 
+                    onClick={async()=>{
+                        await api.post('/accept',{_id:id,index:index})
+                        navigate('/request')
+                    }}
+                className="border-2 rounded-md p-2 hover:bg-gray-200">Accept</button>
+                <button 
+                    onClick={async()=>{
+                        await api.post('/reject',{_id:id,index:index})
+                        window.location.reload()
+                    }}
+                className="border-2 rounded-md p-2 hover:bg-gray-200">Reject</button>
                 </div>
             </div>
         )
@@ -132,9 +145,14 @@ export default function Resolve({id}){
                     {
                         pdfUrl
                         ?
-                        <button onClick={async()=>{
-                            await addNote()
-                        }} type="button" className="border-2 p-2 text-[18px] font-semibold rounded-md hover:bg-gray-200">Confirm</button>
+                        <button 
+                        onClick={
+                            async()=>{
+                                await addResolve()
+                                console.log(formData)
+                            }
+                        } 
+                        type="button" className="border-2 p-2 text-[18px] font-semibold rounded-md hover:bg-gray-200">Confirm</button>
                         :
                         <button onClick={async()=>{
                             await ipfsUpload()
@@ -149,10 +167,15 @@ export default function Resolve({id}){
                 </div>
            </form> 
             <div className="p-4 m-4 space-y-6 flex flex-col items-center justify-center w-full">
-                <TempRequest cid={"QmWMxK4u76itNkVcLqHu8UjCLUZfipKGB1kr6Ywre3YDDS"}/>
-                <TempRequest/>
-                <TempRequest/>
-                <TempRequest/>
+                    {
+                        tmpNotes.length>0
+                        ?
+                        tmpNotes.map((resolve,index)=>(
+                            <TempRequest key={index} args={resolve} index={index}/>
+                        ))
+                        :
+                        <p className="text-3xl">No Resolves yet (-_-)</p>
+                    }
             </div>
            </div>
         </>

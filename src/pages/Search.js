@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import api from "../utils/axios"
 import {useNavigate} from 'react-router-dom'
 import { NoteContext } from "../contexts/context";
@@ -13,12 +13,12 @@ export default function SearchPage(){
         setTag('')
     }
 
-    const [results,setResults] = useState(null);
+    const [results,setResults] = useState([]);
 
-    const {cid,setCid} = useContext(NoteContext)
+    const {cid,setCid,id,setId} = useContext(NoteContext)
 
     function Content(){
-        if(results===null)return <div>No Search Results</div>
+        if(results.length===0)return <div>No Search Results</div>
         else return <div>Results Found</div>    
     }
 
@@ -36,6 +36,7 @@ export default function SearchPage(){
         }
         if(tags.length===0){delete formData.tag}
         console.log(formData);
+        sessionStorage.setItem('search_data',JSON.stringify(formData))
         await fetchNotes(formData)
     }
 
@@ -45,21 +46,28 @@ export default function SearchPage(){
         console.log(res.data)
     } 
 
-    function SearchItem(details){
-        console.log(details.details.CID)
+    useEffect(()=>{
+        if(sessionStorage.getItem('search_data')){
+            fetchNotes(JSON.parse(sessionStorage.getItem('search_data')))
+        }
+    },[])
+
+    function SearchItem({details}){
         const navigate = useNavigate()
         return(
             <div 
                 onClick={()=>{
                     navigate('/note')
-                    setCid(details.details.CID)
-                    sessionStorage.setItem('cid',details.details.CID)
+                    setCid(details.CID)
+                    setId(details._id)
+                    sessionStorage.setItem('cid',details.CID)
+                    sessionStorage.setItem('id',details._id)
                 }}
             className="cursor-pointer flex justify-between border-2 p-4 rounded-md mx-5 w-[80%] items-center">
-                <p>{details.details.title}</p>
+                <p>{details.title}</p>
                 <div className="text-[18px] flex gap-10">
-                    <p>{details.details.course_code}</p>
-                    <p className="">{(details.details.tags)}</p>
+                    <p>{details.course_code}</p>
+                    <p className="">{(details.tags)}</p>
                 </div>
             </div>
         )
@@ -129,7 +137,7 @@ export default function SearchPage(){
             <div className="bg-white flex flex-col  items-center gap-4 font-semibold text-[25px] min-h-screen">
                 <Content/>
                 {
-                    results
+                    results.length>0
                     &&
                     results.map((result,index)=>(
                         <SearchItem details={result} key={index}/>

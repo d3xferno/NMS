@@ -2,7 +2,7 @@ import api from '../utils/axios';
 import Comment from './comment'
 import { useEffect, useState } from 'react'
 
-export default function Comments({cid}){
+export default function Comments({id}){
     const [comments,setComments] = useState([]);
     const [text,setText] = useState('')
 
@@ -15,7 +15,7 @@ export default function Comments({cid}){
         setComments([...comments,cmnt])
         setText('')
         const res = await api.post('/comment',{
-            cid:cid,
+            id:id,
             username:cmnt.username,
             content:cmnt.comment
         })
@@ -23,7 +23,7 @@ export default function Comments({cid}){
     }
 
     async function loadComments(){
-        const cmnts = (await api.get(`note/${cid}`)).data.comments
+        const cmnts = (await api.get(`note/${id}`)).data.comments
         setComments(cmnts) 
     }
 
@@ -51,7 +51,7 @@ export default function Comments({cid}){
                     &&
                     comments.map((comment,index)=>(
                         <Comment 
-                            cid={cid}
+                            id={id}
                             key={index} 
                             username={comment.username} 
                             text={comment.comment} 

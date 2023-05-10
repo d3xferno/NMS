@@ -18,11 +18,13 @@ import { AuthContext, TestContext,NoteContext } from "./contexts/context"
 
 export default function App(){
     const [auth,setAuth] = useState(JSON.parse(sessionStorage.getItem('auth')) || false)
-    const [cid,setCid] = useState(sessionStorage.getItem('cid')||null)
+    const [cid,setCid] = useState(sessionStorage.getItem('cid')|| '')
+    const [id,setId] = useState(sessionStorage.getItem('id') || '')
+
     return (
         <div className="app">
             <AuthContext.Provider value={{auth,setAuth}}>
-            <NoteContext.Provider value={{cid,setCid}}>
+            <NoteContext.Provider value={{cid,setCid,id,setId}}>
             <Navbar/>
             <Routes>
                 <Route path="/" element={<LandingPage/>}/>
@@ -32,7 +34,8 @@ export default function App(){
                 <Route path="/note" element={<Note cid={cid}/>}/>
                 <Route path="/request" element={<RequestPage/>}/>
                 <Route path="/upload" element={<Upload/>}/>
-                <Route path="*" element={<Resolve/>}/>
+                <Route path="/resolve" element={<Resolve/>}/>
+                <Route path="*" element={<Error/>}/>
             </Routes>
             </NoteContext.Provider>
             </AuthContext.Provider>

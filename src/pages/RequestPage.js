@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react"
 import api from "../utils/axios";
-import { AuthContext } from "../contexts/context";
+import { AuthContext, NoteContext } from "../contexts/context";
 import Loading from "../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 export default function RequestPage(){
 
@@ -10,19 +11,30 @@ export default function RequestPage(){
     const [requests,setRequests] = useState([])
     const {auth} = useContext(AuthContext)
     const [loading,setLoading] = useState(false)
+    const {id,setId} = useContext(NoteContext)
+    const navigate = useNavigate()
 
     const [formData,setFormData] = useState({
         title:'',
         department:'',
         tags:[],
-        username:auth.username
+        username:auth.username,
+        resolves:[]
     })
 
-    function Request({title}){
+    function Request({title,_id}){
         return(
             <div className="bg-white w-[80vw] flex justify-between items-center border-2 rounded-md m-2 p-3 text-[20px] font-semibold">
                 <p className="text-[20px]">{title}</p>
-                <button className="border-2 p-2 rounded-md hover:bg-gray-200">Resolve</button>
+                <button 
+                    onClick={
+                        ()=>{
+                            setId(_id)
+                            sessionStorage.setItem('id',_id)
+                            navigate('/resolve')
+                        }
+                    }
+                className="border-2 p-2 rounded-md hover:bg-gray-200">Resolve</button>
             </div>
         )
     }
@@ -42,6 +54,7 @@ export default function RequestPage(){
         await api.post('/addrequest',formData)
         setLoading(false)
         setShow(false)
+        window.location.reload()
     }
 
     useEffect(()=>{
@@ -107,7 +120,7 @@ export default function RequestPage(){
                     requests
                     &&
                     requests.map((req,index)=>(
-                        <Request title={req.title} key={index}/>
+                        <Request title={req.title} _id={req._id} key={index}/>
                     ))
                 }
             </div>

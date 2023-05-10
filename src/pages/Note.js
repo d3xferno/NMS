@@ -5,10 +5,11 @@ import { NoteContext } from "../contexts/context"
 
 export default function Note(){
 
-    const {cid} = useContext(NoteContext)
+    const {cid,id} = useContext(NoteContext)
+    
 
     async function fetchNote(){
-        const data = await api.get(`note/${cid}`)
+        const data = await api.get(`note/${id}`)
         console.log(data.data)
     }
 
@@ -27,16 +28,11 @@ export default function Note(){
                         <img src="upvote.svg" alt="upvote" className="h-5"/>
                         <p>{0}</p>
                     </button>
-                    <button type="button" className="flex items-center gap-2">
-                        <img src="upvote.svg" alt="upvote" className="h-5 rotate-180"/>
-                        <p>{0}</p>
-                    </button>
                     </div>
-                    
                 </div>
                 <iframe src={`https://ipfs.io/ipfs/${cid}`} className="w-full h-[80vh] p-4 outline-none"/>
             </div>
-            <Comments cid={cid}/>
+            <Comments id={id}/>
         </div>
     )
 }
