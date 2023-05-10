@@ -9,7 +9,6 @@ export default function SignUpPage(){
 
     function SignUp(){
         const [uname,setUname] = useState('')
-        const [dept,setDept] = useState('')
         const [pwd,setPwd] = useState('')
         const navigate = useNavigate()
         const [error,setError] = useState(null)
@@ -18,7 +17,6 @@ export default function SignUpPage(){
             e.preventDefault();
             const formData = {
                 username:uname,
-                department:dept,
                 password:pwd
             }
             console.log(formData);
@@ -27,8 +25,10 @@ export default function SignUpPage(){
                 if(res.status==201){
                     setError("User Already Exists")
                 }else{
-                    navigate('/')
-                    setAuth(true)
+                    navigate("/")
+                    setAuth(formData)
+                    console.log(JSON.stringify(formData))
+                    sessionStorage.setItem('auth',JSON.stringify(formData))
                 }
             })
             .catch(err => {
@@ -38,7 +38,7 @@ export default function SignUpPage(){
     
         return(
             <>
-                <form className="bg-white m-4 rounded-md p-4 my-8">
+                <form className="bg-white m-4 rounded-md p-4 my-8 shadow-2xl">
                     <p className="text-center text-5xl font-semibold m-4">Sign Up</p>
                     <div className="flex flex-col space-y-4 p-5 w-[450px]">
                         <label className="text-[20px] font-semibold">Username</label>
@@ -46,21 +46,6 @@ export default function SignUpPage(){
                             value={uname}
                             onChange={(e)=>{setUname(e.target.value)}}
                         type="text" placeholder="Enter Username" className="rounded-sm p-3 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100"/>
-                        <label className="text-[20px] font-semibold">Department</label>
-                        <select 
-                            value={dept}
-                            onChange={(e)=>{setDept(e.target.value)}}
-                        className="rounded-sm p-3 border-2 focus:outline-none focus:border-b-gray-500 focus:bg-gray-100">
-                            <option>Department</option>
-                            <option>BME</option>
-                            <option>CHEM</option>
-                            <option>CIVIL</option>
-                            <option>CSE</option>
-                            <option>ECE</option>
-                            <option>EEE</option>
-                            <option>IT</option>
-                            <option>MECH</option>
-                        </select>
                         <label className="text-[20px] font-semibold">Password</label>
                         <input 
                             value={pwd}
@@ -80,7 +65,7 @@ export default function SignUpPage(){
         )
     }
     return(
-        <div className="flex justify-center items-center w-full 2xl:min-h-screen">
+        <div className="mt-12 flex justify-center items-center w-full 2xl:min-h-screen">
                 <SignUp/>
         </div>
     )

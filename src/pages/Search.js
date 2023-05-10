@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import api from "../utils/axios"
+import {useNavigate} from 'react-router-dom'
+import { NoteContext } from "../contexts/context";
 
 export default function SearchPage(){
     
@@ -10,10 +13,12 @@ export default function SearchPage(){
         setTag('')
     }
 
-    const [results,setResults] = useState(null);
+    const [results,setResults] = useState([]);
+
+    const {cid,setCid,id,setId} = useContext(NoteContext)
 
     function Content(){
-        if(results===null)return <div>No Search Results</div>
+        if(results.length===0)return <div>No Search Results</div>
         else return <div>Results Found</div>    
     }
 
@@ -21,15 +26,51 @@ export default function SearchPage(){
     const [dept,setDept] = useState('');
     const [course,setCourse] = useState('');
 
-    function submit(e){
+    async function submit(e){
         e.preventDefault();
         const formData = {
             text:search,
-            dept:dept,
-            course:course,
-            tags:tags
+            dept:dept.toUpperCase(),
+            course_code:course,
+            tag:tags
         }
+        if(tags.length===0){delete formData.tag}
         console.log(formData);
+        sessionStorage.setItem('search_data',JSON.stringify(formData))
+        await fetchNotes(formData)
+    }
+
+    async function fetchNotes(formData){
+        const res = await api.post('/search',formData)
+        setResults(res.data)
+        console.log(res.data)
+    } 
+
+    useEffect(()=>{
+        if(sessionStorage.getItem('search_data')){
+            fetchNotes(JSON.parse(sessionStorage.getItem('search_data')))
+        }
+    },[])
+
+    function SearchItem({details}){
+        const navigate = useNavigate()
+        return(
+            <div 
+                onClick={()=>{
+                    navigate('/note')
+                    setCid(details.CID)
+                    setId(details._id)
+                    sessionStorage.setItem('cid',details.CID)
+                    sessionStorage.setItem('id',details._id)
+                }}
+            className="cursor-pointer flex justify-between border-2 p-4 rounded-md mx-5 w-[80%] items-center">
+                <p>{details.title}</p>
+                <div className="text-[18px] flex gap-10">
+                    <p>{details.course_code}</p>
+                    <p className="">{(details.tags)}</p>
+                </div>
+            </div>
+        )
     }
 
     return(
@@ -93,8 +134,15 @@ export default function SearchPage(){
                     </div>
                 </div>
             </form>
-            <div className="bg-white flex justify-center font-semibold text-[25px] min-h-screen">
+            <div className="bg-white flex flex-col  items-center gap-4 font-semibold text-[25px] min-h-screen">
                 <Content/>
+                {
+                    results.length>0
+                    &&
+                    results.map((result,index)=>(
+                        <SearchItem details={result} key={index}/>
+                    ))
+                }
             </div>
         </div>
     )

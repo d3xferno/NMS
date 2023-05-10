@@ -1,4 +1,19 @@
-export default function Comment({username,text,likes}){
+import api from "../utils/axios"
+import { useState } from "react"
+
+export default function Comment({id,username,text,likes,index}){
+
+    const [currLikes,setCurrLikes] = useState(likes || 0)
+
+    async function handleLike(){
+        const res = await api.post('/likecomment',{
+            id:id,
+            username:JSON.parse(sessionStorage.getItem('auth')).username,
+            index:index
+        })
+        console.log(res)
+        setCurrLikes(currLikes+(res.data==='Liked'?1:-1))
+    }
     return(
         <>
             <div className="rounded-md mr-10 my-3 border-2 p-3 space-y-2 w-full">
@@ -10,7 +25,9 @@ export default function Comment({username,text,likes}){
                 </div>
                 <p className="ml-8">{text}</p>
                 <div className="flex gap-2 items-center">
-                    <img src="upvote.svg" alt="upvote" className="h-5 ml-8"/><p className="">{likes}</p>
+                    <img 
+                        onClick={handleLike}
+                    src="upvote.svg" alt="upvote" className="h-5 ml-8"/><p className="">{currLikes}</p>
                 </div>
             </div>
         </>
